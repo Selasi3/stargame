@@ -37,8 +37,11 @@ const StarsDisplay = (props) => (
       </div>
       <button onClick={props.onClick}> Play Again </button>
     </div>
-  )
-const Game = (props) => {
+  );
+
+  //CUstom hook
+  const useGmeState = () => {
+
   const [stars, setStars] = useState(utils.random(1,9));
   const [availableNums, setAvailableNums] = useState(utils.range(1,9));
   const [candidateNums, setCandidateNums] = useState([1,2,3]);
@@ -55,6 +58,35 @@ const Game = (props) => {
 
   });
 
+  const setGameState = (newCandidateNums) => {
+    if(utils.sum(newCandidateNums) !== stars){
+      setCandidateNums(newCandidateNums);
+    }
+
+    else{
+      const newAvailabeNums = availableNums.filter(
+        n => !newCandidateNums.includes(n));
+        setStars(utils.randomSumIn(newAvailabeNums,9))
+        setAvailableNums(newAvailabeNums);
+        setCandidateNums([]);
+    }
+  };
+  return {stars, availableNums, candidateNums, secondsLeft, setGameState}
+
+
+  }
+
+const Game = (props) => {
+
+  const {
+    stars,
+    availableNums,
+    candidateNums,
+    secondsLeft,
+    setGameState
+  } =
+    useGmeState();
+
 
 
 
@@ -66,11 +98,7 @@ const Game = (props) => {
 
 
 
-  // const resetGame = () => {
-  //   setStars(utils.random(1,9));
-  //   setAvailableNums(utils.range(1,9));
-  //   setCandidateNums([]);
-  // }
+
   const numberStatus = (number) => {
     if(!availableNums.includes(number)){
       return "used";
@@ -92,18 +120,7 @@ const Game = (props) => {
     candidateNums.concat(number):
     candidateNums.filter(cn => cn !== number)
 
-    if(utils.sum(newCandidateNums) !== stars){
-      setCandidateNums(newCandidateNums);
-    }
-
-    else{
-      const newAvailabeNums = availableNums.filter(
-        n => !newCandidateNums.includes(n));
-        setStars(utils.randomSumIn(newAvailabeNums,9))
-        setAvailableNums(newAvailabeNums);
-        setCandidateNums([]);
-    }
-
+ setGameState(newCandidateNums);
 
 
   }
